@@ -27,6 +27,6 @@ phdr:
     dq 0x1000               ; 0x68: p_align
 
 _start:
-    incbin "code.bin"       ; Starts cleanly at byte 112 (0x70)
+    incbin "make/code.bin"       ; Starts cleanly at byte 112 (0x70)
 
 filesize equ $ - ehdr

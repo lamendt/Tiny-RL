@@ -390,7 +390,8 @@ void shuffle(Deck *deck) {
 }
 
 void dealDamage(short damage, Entity* target) {
-    short s = target->stats[SHEILD] -= damage;
+    modifyStat(&target->stats[SHEILD], -damage);
+    short s = target->stats[SHEILD];
     if (s < 0) {
         target->stats[SHEILD] = 0;
         target->stats[HEALTH] += s;
