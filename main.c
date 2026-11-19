@@ -1,3 +1,4 @@
+//Author: Levi Amendt levi.amendt@gmail.com
 #define CHAR_MAX 127
 #define CHAR_MIN -128
 
@@ -90,7 +91,7 @@ static void seed();
 static unsigned int rand();
 static void useCard(Card *card, Entity *source, Entity *target);
 static void fight();
-static void dealDamage(char damage, Entity* target);
+static void dealDamage(short damage, Entity* target);
 static void shuffle(Deck* deck);
 static void generateCard(Card* card, char xp);
 static void death();
@@ -106,7 +107,7 @@ static void generateDeck(Deck* deck, char size, char xp);
 static void printDeck(Deck* deck);
 static void printBattleState();
 static void printBattleHelper(Entity* entity);
-static void modifyStat(char* stat, char value);
+static void modifyStat(char* stat, short value);
 
 //globals
 unsigned int rngState;
@@ -148,7 +149,7 @@ void printnl() {
 }
 
 void read() {
-    char n;
+    long n;
     asm volatile("syscall": "=a"(n): "a"(0), "D"(0), "S"(inputBuf), "d"(INPUT_BUF_SIZE): "rcx", "r11", "memory");
     inputBuf[n] = '\0';
     return;
@@ -177,7 +178,7 @@ void printn(char num) {
         str[i--] = num % 10 + '0';
         num /= 10;
     } while (num);
-    write(str + i, 12 - i);
+    write(str + i + 1, 11 - i);
     return;
 }
 
@@ -249,7 +250,7 @@ void useCard(Card *card, Entity *source, Entity *target) {
     return;
 }
 
-void modifyStat(char* stat, char value) {
+void modifyStat(char* stat, short value) {
     if (__builtin_add_overflow(*stat, value, stat)) {
         if (value > 0)
             *stat = CHAR_MAX;
@@ -335,7 +336,7 @@ void fight() {
 }
 
 void generateCard(Card* card, char xp) {
-    char budget = (rand() % (xp / 2)) + (xp / 2);
+    short budget = (rand() % (xp / 2)) + (xp / 2);
     card->numEffects = rand() % (MAX_EFFECTS + 2) + 1;
     if (card->numEffects > MAX_EFFECTS)
         card->numEffects = 1;
@@ -345,7 +346,7 @@ void generateCard(Card* card, char xp) {
     else
         budget *= 2;
     for (char i = 0; i < card->numEffects; i++) {
-        char x = rand() % budget;
+        short x = rand() % budget;
         budget -= x;
         card->types[i] = rand() % (NUM_TYPES * 2);
         if (card->types[i] > NUM_TYPES - 1)
@@ -388,8 +389,8 @@ void shuffle(Deck *deck) {
     return;
 }
 
-void dealDamage(char damage, Entity* target) {
-    char s = target->stats[SHEILD] -= damage;
+void dealDamage(short damage, Entity* target) {
+    short s = target->stats[SHEILD] -= damage;
     if (s < 0) {
         target->stats[SHEILD] = 0;
         target->stats[HEALTH] += s;
